@@ -1069,8 +1069,9 @@
        CONFIGURATION
     ======================================== */
 
-    const SESSION_ENDPOINT =
-      "https://foqiljrqfapntbivriqz.supabase.co/rest/v1/";
+    
+    const SESSION_ENDPOINT = 
+        "https://foqiljrqfapntbivriqz.supabase.co/functions/v1/anam-eleven-session";
 
     const AVATAR_ID =
       "6dbc1e47-7768-403e-878a-94d7fcc3677b";
@@ -1462,102 +1463,59 @@
     }
 
 
-    /* ========================================
-       CREATE SESSION
-    ======================================== */
+/* ========================================
+   CREATE SESSION
+======================================== */
 
-    async function createSession() {
-
-      const response =
-        await fetch(
-          SESSION_ENDPOINT,
-          {
-
-            method:
-              "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
-            body:
-              JSON.stringify(
-                {
-
-                  avatarId:
-                    AVATAR_ID,
-
-                  agentId:
-                    AGENT_ID
-
-                }
-              ),
-
-            cache:
-              "no-store"
-
-          }
-        );
-
-
-      let data = null;
-
-
-      try {
-
-        data =
-          await response.json();
-
-      } catch {
-
-        throw new Error(
-          `Supabase returned HTTP ${response.status}.`
-        );
-
-      }
-
-
-      if (
-        !response.ok
-      ) {
-
-        throw new Error(
-          data?.details ||
-          data?.error ||
-          `HTTP ${response.status}`
-        );
-
-      }
-
-
-      if (
-        !data?.success
-      ) {
-
-        throw new Error(
-          data?.error ||
-          "Unable to create avatar session."
-        );
-
-      }
-
-
-      if (
-        !data?.sessionToken
-      ) {
-
-        throw new Error(
-          "Supabase did not return an Anam session token."
-        );
-
-      }
-
-
-      return data.sessionToken;
-
+async function createSession() {
+  const response = await fetch(
+    SESSION_ENDPOINT,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({
+        avatarId: AVATAR_ID,
+        agentId: AGENT_ID
+      }),
+      cache: "no-store"
     }
+  );
 
+  let data = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error(`Supabase returned HTTP ${response.status}.`);
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      data?.details ||
+      data?.error ||
+      `HTTP ${response.status}`
+    );
+  }
+
+  if (!data?.success) {
+    throw new Error(
+      data?.error ||
+      "Unable to create avatar session."
+    );
+  }
+
+  if (!data?.sessionToken) {
+    throw new Error(
+      "Supabase did not return an Anam session token."
+    );
+  }
+
+  return data.sessionToken;
+}
 
     /* ========================================
        START CONVERSATION
